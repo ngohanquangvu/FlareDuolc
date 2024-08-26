@@ -32,9 +32,10 @@ def print_zone_status(zones):
     for zone in zones:
         if zone["status"] == "pending" or zone["status"] == "moved":
             open("result.txt", "a").write(f"{zone['name']}|{zone['status']}\n")
-    print("Done!")
 
-API_TOKEN = open("api_token.txt", "r").read().strip()
+for API_TOKEN in open("api_token.txt", "r").read().splitlines():
 
-zones = get_zones(API_TOKEN)
-print_zone_status(zones)
+    zones = get_zones(API_TOKEN)
+    print_zone_status(zones)
+    print(f"Hoàn thành lấy thông tin zone với API Token {API_TOKEN}")
+out = input("Nhấn Enter để thoát...")
