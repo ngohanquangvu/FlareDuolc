@@ -1,0 +1,40 @@
+def get_zones(api_token):
+    url = "https://api.cloudflare.com/client/v4/zones"
+    headers = {
+        "Authorization": f"Bearer {api_token}",
+        "Content-Type": "application/json",
+    }
+
+    params = {
+        "page": 1,
+        "per_page": 50,  # Số lượng zone lấy mỗi trang, bạn có thể tùy chỉnh con số này
+    }
+
+    zones = []
+
+    while True:
+        response = requests.get(url, headers=headers, params=params)
+        if response.status_code != 200:
+            print(f"Error: {response.status_code} - {response.text}")
+            break
+
+        data = response.json()
+        zones.extend(data["result"])
+
+        if params["page"] == data["result_info"]["total_pages"]:
+            break
+
+        params["page"] += 1
+
+    return zones
+
+def print_zone_status(zones):
+    for zone in zones:
+        if zone["status"] == "pending" or zone["status"] == "moved":
+            open("result.txt", "a").write(f"{zone['name']}|{zone['status']}\n")
+    print("Done!")
+
+API_TOKEN = open("api_token.txt", "r").read().strip()
+
+zones = get_zones(API_TOKEN)
+print_zone_status(zones)
